@@ -1,0 +1,2 @@
+Dockerfile with persistent volume:
+https://medium.com/@manav503/how-to-build-docker-images-inside-a-jenkins-container-d59944102f30
