@@ -1,0 +1,95 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: jenkins
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      serviceAccountName: jenkins
+      containers:
+       - name: jenkins
+         image: jenkins:1.0
+         volumeMounts:
+          - name: jenkins-home
+            mountPath: /var/jenkins_home
+          - name: docker-sock-volume
+            mountPath: /var/run/docker.sock
+         resources:
+           requests:
+             memory: "1024Mi"
+             cpu: "0.5"
+           limits: 
+             memory: "1024Mi"
+             cpu: "1"
+         ports:
+           - containerPort: 8080
+      volumes:
+       - name: jenkins-home
+         emptyDir: {}
+       - name: docker-sock-volume
+         hostPath:
+           path: /var/run/docker.sock
+		   
+---
+
+apiVersion: v1
+kind: Service
+metadata:
+  name: jenkins-svc
+spec:
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30000
+  selector:
+    app: jenkins
+	
+	
+	
+	
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: jenkins
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      serviceAccountName: jenkins
+      containers:
+       - name: jenkins
+         image: jenkins:1.0
+         volumeMounts:
+          - name: jenkins-home
+            mountPath: /var/jenkins_home
+          - name: docker-sock-volume
+            mountPath: /var/run/docker.sock
+         resources:
+           requests:
+             memory: "1024Mi"
+
+			 
+kind: ConfigMap
+metadata:
+  creationTimestamp: null
+  name: kubectl-jenkins-context
+data:
+  kubectl-config-context.sh: |-
+    #!/bin/bash -v
+    kubectl config set-credentials jenkins --token=$(cat /var/run/secrets/kubernetes.io/serviceaccount/token)
+    kubectl config set-cluster minikube --server="https://192.168.99.100:8443" --certificate-authority="/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+    kubectl config set-context jenkins-minikube --cluster=minikube --user=jenkins --namespace=$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)
+    kubectl config use-context jenkins-cluster
+    chmod 755 ~/.kube/config
+	
+	
+	
+kubectl config set-context jenkins-cluster --cluster=kubernetes --user=jenkins --namespace=$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace)

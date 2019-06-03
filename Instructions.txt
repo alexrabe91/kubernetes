@@ -1,2 +1,32 @@
+#------------------------------------------------------------#
+##########---------- Install Instructions ----------##########
+#------------------------------------------------------------#
+
+
+#--------- 1. Install Docker, Kubernetes and necessary packages
+
+#---Update Packages---#
+sudo apt-get update
+sudo apt-get install -y apt-transport-https
+
+sudo su -
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add
+cat <<EOF > /etc/apt/sources.list.d/kubernetes.list
+deb http://apt.kubernetes.io/ kubernetes-xenial main
+
+apt-get update
+
+#---Install Docker---#
+apt-get install -y docker.io
+
+#--- Install Kubelet, Kubeadm, Kubectl and Kubernetes ---#
+apt-get install -y kubelet kubeadm kubectl kubernetes-cni
+
+
+#--------- 2. Install and configure the Master Node
+exit
+mkdir -p $HOME/.kube
+
+
 Dockerfile with persistent volume:
 https://medium.com/@manav503/how-to-build-docker-images-inside-a-jenkins-container-d59944102f30

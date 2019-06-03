@@ -1,0 +1,35 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: jenkins
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: jenkins
+    spec:
+      serviceAccountName: jenkins
+      containers:
+       - name: jenkins
+         image: jenkins:1.0
+         volumeMounts:
+          - name: jenkins-home
+            mountPath: /var/jenkins_home
+          - name: docker-sock-volume
+            mountPath: /var/run/docker.sock
+         resources:
+           requests:
+             memory: "1024Mi"
+             cpu: "0.5"
+           limits:
+             memory: "1024Mi"
+             cpu: "1"
+         ports:
+           - containerPort: 8080
+      volumes:
+       - name: jenkins-home
+         emptyDir: {}
+       - name: docker-sock-volume
+         hostPath:
+           path: /var/run/docker.sock
